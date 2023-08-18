@@ -9,7 +9,9 @@
  */
 package web
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 // UserHandler 我准备在上面定义跟用户有关的路由
 type UserHandler struct {
@@ -23,13 +25,16 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 		ConfirmPassword string `json:"confirmPassword"`
 	}
 	var req SignupReq
-	err := ctx.Bind(req)
-	if err != nil {
-		return
+
+	if err := ctx.BindJSON(req); err != nil {
+		ctx.JSON(200, gin.H{
+			"message": err,
+		})
+	} else {
+		ctx.JSON(200, gin.H{
+			"message": "success",
+		})
 	}
-	ctx.JSON(200, gin.H{
-		"message": "success",
-	})
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
