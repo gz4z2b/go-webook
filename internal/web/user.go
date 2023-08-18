@@ -26,15 +26,23 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 	}
 	var req SignupReq
 
-	if err := ctx.BindJSON(req); err != nil {
-		ctx.JSON(200, gin.H{
-			"message": err,
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(400, gin.H{
+			"message": "数据格式错误",
 		})
-	} else {
-		ctx.JSON(200, gin.H{
-			"message": "success",
-		})
+		return
 	}
+
+	if req.Password != req.ConfirmPassword {
+		ctx.JSON(200, gin.H{
+			"message": "两次输入的密码不一致",
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+	})
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
