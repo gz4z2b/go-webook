@@ -16,6 +16,23 @@ import (
 
 // UserHandler 我准备在上面定义跟用户有关的路由
 type UserHandler struct {
+	emailExpersion    *regexp.Regexp
+	passwordExpersion *regexp.Regexp
+}
+
+// UserHandler构造方法
+func NewUserHandler() *UserHandler {
+	const (
+		passwordRegexpPattern = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$`
+		emailRegextPattern    = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	)
+	passwordExpersion := regexp.MustCompile(passwordRegexpPattern, regexp.None)
+	emailExpersion := regexp.MustCompile(emailRegextPattern, regexp.None)
+
+	return &UserHandler{
+		emailExpersion:    emailExpersion,
+		passwordExpersion: passwordExpersion,
+	}
 }
 
 func (u *UserHandler) Signup(ctx *gin.Context) {
@@ -41,12 +58,7 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 		return
 	}
 
-	const (
-		passwordRegexpPattern = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$`
-		emailRegextPattern    = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	)
-	passwordExpersion := regexp.MustCompile(passwordRegexpPattern, regexp.None)
-	ok, err := passwordExpersion.MatchString(req.Password)
+	ok, err := u.passwordExpersion.MatchString(req.Password)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"message": "系统错误",
@@ -59,8 +71,8 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 		})
 		return
 	}
-	emailExpersion := regexp.MustCompile(emailRegextPattern, regexp.None)
-	ok, err = emailExpersion.MatchString(req.Email)
+
+	ok, err = u.emailExpersion.MatchString(req.Email)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"message": "系统错误",
