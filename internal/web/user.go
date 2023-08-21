@@ -10,6 +10,7 @@
 package web
 
 import (
+	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,8 +35,41 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 	}
 
 	if req.Password != req.ConfirmPassword {
-		ctx.JSON(200, gin.H{
+		ctx.JSON(503, gin.H{
 			"message": "两次输入的密码不一致",
+		})
+		return
+	}
+
+	const (
+		passwordRegexpPattern = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$`
+		emailRegextPattern    = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	)
+	passwordExpersion := regexp.MustCompile(passwordRegexpPattern, regexp.None)
+	ok, err := passwordExpersion.MatchString(req.Password)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": "系统错误",
+		})
+		return
+	}
+	if !ok {
+		ctx.JSON(503, gin.H{
+			"message": "密码复杂度不够",
+		})
+		return
+	}
+	emailExpersion := regexp.MustCompile(emailRegextPattern, regexp.None)
+	ok, err = emailExpersion.MatchString(req.Email)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": "系统错误",
+		})
+		return
+	}
+	if !ok {
+		ctx.JSON(503, gin.H{
+			"message": "邮箱格式不正确",
 		})
 		return
 	}
