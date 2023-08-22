@@ -10,6 +10,8 @@
 package web
 
 import (
+	"net/http"
+
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 )
@@ -45,50 +47,36 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 	var req SignupReq
 
 	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"message": "数据格式错误",
-		})
+		ctx.String(http.StatusOK, "数据格式错误")
 		return
 	}
 
 	if req.Password != req.ConfirmPassword {
-		ctx.JSON(503, gin.H{
-			"message": "两次输入的密码不一致",
-		})
+		ctx.String(http.StatusOK, "两次输入的密码不一致")
 		return
 	}
 
 	ok, err := u.passwordExpersion.MatchString(req.Password)
 	if err != nil {
-		ctx.JSON(500, gin.H{
-			"message": "系统错误",
-		})
+		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
 	if !ok {
-		ctx.JSON(503, gin.H{
-			"message": "密码复杂度不够",
-		})
+		ctx.String(http.StatusOK, "密码复杂度不够")
 		return
 	}
 
 	ok, err = u.emailExpersion.MatchString(req.Email)
 	if err != nil {
-		ctx.JSON(500, gin.H{
-			"message": "系统错误",
-		})
+		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
 	if !ok {
-		ctx.JSON(503, gin.H{
-			"message": "邮箱格式不正确",
-		})
+		ctx.String(http.StatusOK, "邮箱格式不正确")
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"message": "success",
-	})
+	ctx.String(http.StatusOK, "success")
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
