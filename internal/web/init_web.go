@@ -20,7 +20,7 @@ func RegisterRoutes() *gin.Engine {
 }
 
 func registerUserRoutes(server *gin.Engine) {
-	user := &UserHandler{}
+	user := NewUserHandler()
 
 	userGroup := server.Group("/users")
 	userGroup.POST("/signup", user.Signup)
