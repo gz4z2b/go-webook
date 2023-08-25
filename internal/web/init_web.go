@@ -14,7 +14,15 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/gz4z2b/go-webook/internal/repository"
+	"github.com/gz4z2b/go-webook/internal/repository/dao"
+	"github.com/gz4z2b/go-webook/internal/service"
+	"github.com/gz4z2b/go-webook/internal/web/middleware"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func RegisterRoutes() *gin.Engine {
@@ -38,17 +46,33 @@ func RegisterRoutes() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	store := cookie.NewStore([]byte("secret"))
+	server.Use(sessions.Sessions("mysession", store))
+	server.Use(middleware.NewLoginMiddlewareBuilder().IgnorePath("/users/signup").IgnorePath("/users/login").Build())
+
 	registerUserRoutes(server)
 
 	return server
 }
 
 func registerUserRoutes(server *gin.Engine) {
-	user := NewUserHandler()
+	user := initUser()
 
 	userGroup := server.Group("/users")
 	userGroup.POST("/signup", user.Signup)
 	userGroup.GET("/:uid", user.Profile)
 	userGroup.POST("/login", user.Login)
 	userGroup.POST("/edit", user.Edit)
+}
+
+func initUser() *UserHandler {
+	db, err := gorm.Open(mysql.Open("root:gz4z2b@tcp(127.0.0.1:13316)/webook"), &gorm.Config{})
+	if err != nil {
+		panic("数据库初始化失败")
+	}
+	userDAO := dao.NewUserDAO(db)
+	userRepo := repository.NewUserRepository(userDAO)
+	userService := service.NewUserService(userRepo)
+	user := NewUserHandler(userService)
+	return user
 }

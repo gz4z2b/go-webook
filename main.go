@@ -9,22 +9,19 @@
  */
 package main
 
-import (
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-)
+import "github.com/gz4z2b/go-webook/internal/web"
 
 func main() {
 
-	//server := web.RegisterRoutes()
+	server := web.RegisterRoutes()
 
-	db, err := gorm.Open(mysql.Open("root:gz4z2b@tcp(127.0.0.1:3306)/webook"), &gorm.Config{})
-	if err != nil {
-		panic("数据库链接失败")
-	}
-	db = db.Debug()
+	// db, err := gorm.Open(mysql.Open("root:gz4z2b@tcp(127.0.0.1:3306)/webook"), &gorm.Config{})
+	// if err != nil {
+	// 	panic("数据库链接失败")
+	// }
+	// db = db.Debug()
 
-	db.AutoMigrate(&User{})
+	// db.AutoMigrate(&User{})
 
-	//server.Run(":8080")
+	server.Run(":8080")
 }
