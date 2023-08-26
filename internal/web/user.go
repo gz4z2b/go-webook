@@ -38,7 +38,7 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 		emailRegextPattern      = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 		nickNameRegexPattern    = `^[\u4E00-\u9FFFa-zA-Z0-9!@#$%^&*()_+=\-[\]{}|\\:;"'<>,.?/~]{1,64}$`
 		birthdayRegexPattern    = `^\d{4}-\d{2}-\d{2}$`
-		descriptionRegexPattern = `^[\u4E00-\u9FFFa-zA-Z0-9!@#$%^&*()_+=\-[\]{}|\\:;"'<>,.?/~]{1,1024}$`
+		descriptionRegexPattern = `^[\u4E00-\u9FFFa-zA-Z0-9!@#$%^&*()_+=\-[\]{}|\\:;。，？！……「」【】；'<>,.?/~]{1,10240}$`
 	)
 	passwordExpersion := regexp.MustCompile(passwordRegexpPattern, regexp.None)
 	emailExpersion := regexp.MustCompile(emailRegextPattern, regexp.None)
@@ -211,13 +211,14 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 		return
 	}
 
-	birthDay, err := time.ParseInLocation("2006-01-02 15:04:05", req.BirthDay+" 00:00:00", time.Local)
+	birthDay, err := time.ParseInLocation("2006-01-02", req.BirthDay, time.Local)
 	if err != nil {
 		ctx.String(http.StatusOK, "系统错误")
+		return
 	}
 	_, err = u.svc.AddProfile(ctx, user, &domain.Profile{
 		NickName:    req.NickName,
-		BirthDay:    birthDay.UnixMilli(),
+		BirthDay:    birthDay.UnixNano() / int64(time.Millisecond),
 		Description: req.Description,
 	})
 	if err != nil {

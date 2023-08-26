@@ -1,5 +1,7 @@
 create database webook;
 
+use webook;
+
 CREATE TABLE `t_user_profile` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Id',
   `user_id` int unsigned NOT NULL DEFAULT '0' COMMENT '用户id',
