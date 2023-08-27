@@ -15,7 +15,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/gz4z2b/go-webook/internal/repository"
 	"github.com/gz4z2b/go-webook/internal/repository/dao"
@@ -46,8 +46,13 @@ func RegisterRoutes() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	store := cookie.NewStore([]byte("secret"))
-	server.Use(sessions.Sessions("mysession", store))
+	//store := cookie.NewStore([]byte("secret"))
+	//store := memstore.NewStore([]byte("WnXqVdx2tPCKRQMPb2L6YXoKaHvbDvMd"), []byte("NIVL94TXGmuKmFON6ud71dulRCjXALMy"))
+	store, err := redis.NewStore(16, "tcp", "localhost:13317", "", []byte("WnXqVdx2tPCKRQMPb2L6YXoKaHvbDvMd"), []byte("NIVL94TXGmuKmFON6ud71dulRCjXALMy"))
+	if err != nil {
+		panic(err)
+	}
+	server.Use(sessions.Sessions("login", store))
 	server.Use(middleware.NewLoginMiddlewareBuilder().IgnorePath("/users/signup").IgnorePath("/users/login").Build())
 
 	registerUserRoutes(server)
