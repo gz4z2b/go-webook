@@ -17,6 +17,7 @@ import (
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/gz4z2b/go-webook/internal/domain"
 	"github.com/gz4z2b/go-webook/internal/service"
 )
@@ -134,7 +135,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := u.svc.Login(ctx, &domain.User{
+	_, err = u.svc.Login(ctx, &domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -146,8 +147,15 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
-	session.Set("user_email", user.Email)
-	session.Save()
+	token := jwt.New(jwt.SigningMethodHS512)
+	tokenStr, err := token.SignedString([]byte("1J4HLQesjfta8xLQwFDT079VZ6fAasTeyHvlvEMRe4JPVu2DSXJV1OeWflzWJKrv"))
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+	ctx.Header("x-jwt-token", tokenStr)
+
+	// session.Set("user_email", user.Email)
+	// session.Save()
 	ctx.String(http.StatusOK, "登录成功")
 }
 
@@ -218,7 +226,7 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 	}
 	_, err = u.svc.AddProfile(ctx, user, &domain.Profile{
 		NickName:    req.NickName,
-		BirthDay:    birthDay.UnixNano() / int64(time.Millisecond),
+		BirthDay:    birthDay.UnixMilli(),
 		Description: req.Description,
 	})
 	if err != nil {
@@ -251,4 +259,13 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 
 	ctx.String(http.StatusOK, fmt.Sprintf("user：%v+, profile:%v+", user, profile))
 
+}
+
+func (u *UserHandler) Logout(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	session.Options(sessions.Options{
+		MaxAge: -1,
+	})
+	session.Save()
+	ctx.String(http.StatusOK, "success")
 }

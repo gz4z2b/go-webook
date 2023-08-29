@@ -11,6 +11,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -38,13 +39,32 @@ func (loginMiddlewareBuilder *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		}
 
 		session := sessions.Default(ctx)
+		session.Options(sessions.Options{
+			MaxAge: 30,
+		})
 		email := session.Get("user_email")
 		if email == nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 		ctx.Set("user_email", email)
+		now := time.Now().UnixMilli()
+		lastLoginTime := session.Get("login_time")
+		if lastLoginTime == nil {
+			session.Set("login_time", now)
+			if err := session.Save(); err != nil {
+				panic(err)
+			}
+			return
+		}
+		lastLoginTimeVal, ok := lastLoginTime.(int64)
+		if !ok {
+			ctx.AbortWithStatus(http.StatusInternalServerError)
+		}
+		if now-lastLoginTimeVal > 10000 {
+			session.Set("login_time", now)
+			session.Save()
+		}
 
-		return
 	}
 }

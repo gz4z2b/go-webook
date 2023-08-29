@@ -48,7 +48,7 @@ func RegisterRoutes() *gin.Engine {
 
 	//store := cookie.NewStore([]byte("secret"))
 	//store := memstore.NewStore([]byte("WnXqVdx2tPCKRQMPb2L6YXoKaHvbDvMd"), []byte("NIVL94TXGmuKmFON6ud71dulRCjXALMy"))
-	store, err := redis.NewStore(16, "tcp", "localhost:13317", "", []byte("WnXqVdx2tPCKRQMPb2L6YXoKaHvbDvMd"), []byte("NIVL94TXGmuKmFON6ud71dulRCjXALMy"))
+	store, err := redis.NewStore(16, "tcp", "localhost:13317", "", []byte("MXE4iuIoCMBX3Qnco2eqCkSVpIh1v8L3GirpwushYuuhoZI9DoFg7MlJbIYEZmKr"), []byte("he4GdM1Ki9OVbCAqgGCJQeoCffADbx3C"))
 	if err != nil {
 		panic(err)
 	}
@@ -68,6 +68,7 @@ func registerUserRoutes(server *gin.Engine) {
 	userGroup.GET("/:uid", user.Profile)
 	userGroup.POST("/login", user.Login)
 	userGroup.POST("/edit", user.Edit)
+	userGroup.POST("/logout", user.Logout)
 }
 
 func initUser() *UserHandler {
