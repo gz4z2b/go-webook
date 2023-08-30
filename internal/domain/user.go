@@ -9,6 +9,8 @@
  */
 package domain
 
+import jwt "github.com/golang-jwt/jwt/v5"
+
 type User struct {
 	Id       uint64
 	Email    string
@@ -21,4 +23,10 @@ type Profile struct {
 	NickName    string
 	BirthDay    int64
 	Description string
+}
+
+type UserClaims struct {
+	jwt.RegisteredClaims
+	Email     string
+	UserAgent string
 }

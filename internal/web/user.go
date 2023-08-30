@@ -116,13 +116,6 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 
 func (u *UserHandler) Login(ctx *gin.Context) {
 
-	session := sessions.Default(ctx)
-	email := session.Get("user_email")
-	if email != nil {
-		ctx.String(http.StatusOK, "已经登录过了")
-		return
-	}
-
 	// 登录
 	type loginReq struct {
 		Email    string `json:"email"`
@@ -147,7 +140,15 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
-	token := jwt.New(jwt.SigningMethodHS512)
+
+	userClaims := domain.UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+		Email:     req.Email,
+		UserAgent: ctx.Request.UserAgent(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, userClaims)
 	tokenStr, err := token.SignedString([]byte("1J4HLQesjfta8xLQwFDT079VZ6fAasTeyHvlvEMRe4JPVu2DSXJV1OeWflzWJKrv"))
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)

@@ -25,3 +25,7 @@ func TestEncrypt(t *testing.T) {
 	err = bcrypt.CompareHashAndPassword(encrypted, []byte(password))
 	assert.NoError(t, err)
 }
+
+func TestNil(t *testing.T) {
+
+}
