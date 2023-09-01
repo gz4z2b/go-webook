@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: webook-mysql-claim
+  namespace: default
+  labels:
+    app: webook-mysql-claim
+spec:
+  storageClassName: mysql-pv
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
