@@ -16,6 +16,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/gz4z2b/go-webook/conf"
 	"github.com/gz4z2b/go-webook/internal/domain"
 )
 
@@ -53,7 +54,7 @@ func (loginMiddlewareBuilder *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		tokenStr := segs[1]
 		claims := &domain.UserClaims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-			return []byte("1J4HLQesjfta8xLQwFDT079VZ6fAasTeyHvlvEMRe4JPVu2DSXJV1OeWflzWJKrv"), nil
+			return []byte(conf.Keys.AuthorizationKey), nil
 		})
 		if err != nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
@@ -78,7 +79,7 @@ func (loginMiddlewareBuilder *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 				UserAgent: ctx.Request.UserAgent(),
 			}
 			token := jwt.NewWithClaims(jwt.SigningMethodHS512, userClaims)
-			tokenStr, err := token.SignedString([]byte("1J4HLQesjfta8xLQwFDT079VZ6fAasTeyHvlvEMRe4JPVu2DSXJV1OeWflzWJKrv"))
+			tokenStr, err := token.SignedString([]byte(conf.Keys.AuthorizationKey))
 			if err != nil {
 				ctx.AbortWithStatus(http.StatusInternalServerError)
 			}

@@ -18,6 +18,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/gz4z2b/go-webook/conf"
 	"github.com/gz4z2b/go-webook/internal/domain"
 	"github.com/gz4z2b/go-webook/internal/service"
 )
@@ -149,7 +150,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		UserAgent: ctx.Request.UserAgent(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, userClaims)
-	tokenStr, err := token.SignedString([]byte("1J4HLQesjfta8xLQwFDT079VZ6fAasTeyHvlvEMRe4JPVu2DSXJV1OeWflzWJKrv"))
+	tokenStr, err := token.SignedString([]byte(conf.Keys.AuthorizationKey))
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 	}

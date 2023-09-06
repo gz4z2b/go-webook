@@ -10,6 +10,7 @@
 package web
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +27,8 @@ func TestEncrypt(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestNil(t *testing.T) {
-
+func TestTest(t *testing.T) {
+	str := fmt.Sprintf("%s:%s", "gz3z2b", "db")
+	println(str)
+	assert.NoError(t, nil)
 }
