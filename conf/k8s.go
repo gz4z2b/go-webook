@@ -4,7 +4,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-09-04 20:42:52
  * @LastEditors: p_hanxichen
- * @FilePath: /webook/conf/k8s.go
+ * @FilePath: /go/src/webook/conf/k8s.go
  * @Description: k8s配置
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -24,6 +24,7 @@ var Redis = RedisConf{
 	Host:     "webook-redis",
 	Port:     "11310",
 	Password: "",
+	Db:       1,
 }
 
 var Keys = KeyConf{

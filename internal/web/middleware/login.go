@@ -2,7 +2,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-08-23 20:45:58
  * @LastEditors: p_hanxichen
- * @FilePath: /webook/internal/web/middleware/login.go
+ * @FilePath: /go/src/webook/internal/web/middleware/login.go
  * @Description:
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -66,6 +66,11 @@ func (loginMiddlewareBuilder *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		}
 
 		if ctx.Request.UserAgent() != claims.UserAgent {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		if claims.Email == "" {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

@@ -2,7 +2,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-09-04 20:24:41
  * @LastEditors: p_hanxichen
- * @FilePath: /webook/conf/types.go
+ * @FilePath: /go/src/webook/conf/types.go
  * @Description:配置
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -21,6 +21,7 @@ type RedisConf struct {
 	Host     string
 	Port     string
 	Password string
+	Db       int
 }
 
 type KeyConf struct {

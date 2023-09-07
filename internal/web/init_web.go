@@ -2,7 +2,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-08-16 20:44:46
  * @LastEditors: p_hanxichen
- * @FilePath: /webook/internal/web/init_web.go
+ * @FilePath: /go/src/webook/internal/web/init_web.go
  * @Description: 网络服务初始化
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -19,9 +19,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gz4z2b/go-webook/conf"
 	"github.com/gz4z2b/go-webook/internal/repository"
+	"github.com/gz4z2b/go-webook/internal/repository/cache"
 	"github.com/gz4z2b/go-webook/internal/repository/dao"
 	"github.com/gz4z2b/go-webook/internal/service"
 	"github.com/gz4z2b/go-webook/internal/web/middleware"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -81,7 +83,12 @@ func initUser() *UserHandler {
 		panic("数据库初始化失败")
 	}
 	userDAO := dao.NewUserDAO(db)
-	userRepo := repository.NewUserRepository(userDAO)
+	userCache := cache.NewUserCache(redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", conf.Redis.Host, conf.Redis.Port),
+		Password: conf.Redis.Password, // no password set
+		DB:       conf.Redis.Db,       // use default DB
+	}))
+	userRepo := repository.NewUserRepository(userDAO, userCache)
 	userService := service.NewUserService(userRepo)
 	user := NewUserHandler(userService)
 	return user

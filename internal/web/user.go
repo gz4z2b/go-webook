@@ -2,7 +2,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-08-16 20:27:11
  * @LastEditors: p_hanxichen
- * @FilePath: /webook/internal/web/user.go
+ * @FilePath: /go/src/webook/internal/web/user.go
  * @Description: 用户接口
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -15,7 +15,6 @@ import (
 	"time"
 
 	regexp "github.com/dlclark/regexp2"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/gz4z2b/go-webook/conf"
@@ -134,7 +133,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		Password: req.Password,
 	})
 	if err != nil {
-		if err == service.ErrEmailNotFound || err == service.ErrPasswordInvalid {
+		if err == service.ErrUserNotFound || err == service.ErrPasswordInvalid {
 			ctx.String(http.StatusOK, "邮箱或密码错误")
 			return
 		}
@@ -156,8 +155,6 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	}
 	ctx.Header("x-jwt-token", tokenStr)
 
-	// session.Set("user_email", user.Email)
-	// session.Save()
 	ctx.String(http.StatusOK, "登录成功")
 }
 
@@ -264,10 +261,18 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Logout(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	session.Options(sessions.Options{
-		MaxAge: -1,
-	})
-	session.Save()
+	userClaims := domain.UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+		Email:     "",
+		UserAgent: ctx.Request.UserAgent(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, userClaims)
+	tokenStr, err := token.SignedString([]byte(conf.Keys.AuthorizationKey))
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
+	ctx.Header("x-jwt-token", tokenStr)
 	ctx.String(http.StatusOK, "success")
 }
