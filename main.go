@@ -9,8 +9,10 @@
  */
 package main
 
+import "github.com/gz4z2b/go-webook/ioc"
+
 func main() {
 
-	server := InitWebService()
+	server := ioc.InitWebService()
 	server.Run(":8080")
 }

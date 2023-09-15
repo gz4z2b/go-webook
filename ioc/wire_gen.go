@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package main
+package ioc
 
 import (
 	"github.com/gin-gonic/gin"
@@ -13,15 +13,14 @@ import (
 	"github.com/gz4z2b/go-webook/internal/repository/dao"
 	"github.com/gz4z2b/go-webook/internal/service"
 	"github.com/gz4z2b/go-webook/internal/web"
-	"github.com/gz4z2b/go-webook/ioc"
 )
 
 // Injectors from wire.go:
 
 func InitWebService() *gin.Engine {
-	db := ioc.InitDb()
+	db := InitDb()
 	userDAO := dao.NewUserDAO(db)
-	cmdable := ioc.InitCache()
+	cmdable := InitCache()
 	userCache := cache.NewUserCache(cmdable)
 	userRepository := repository.NewUserRepository(userDAO, userCache)
 	userService := service.NewUserService(userRepository)
