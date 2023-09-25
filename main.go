@@ -13,6 +13,7 @@ import "github.com/gz4z2b/go-webook/ioc"
 
 func main() {
 
-	server := ioc.InitWebService()
+	//server := ioc.InitWebService()
+	server := ioc.InitDownCacheWebService()
 	server.Run(":8080")
 }

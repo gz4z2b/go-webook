@@ -19,10 +19,23 @@ import (
 
 func InitWebService() *gin.Engine {
 	db := InitDb()
-	userDAO := dao.NewUserDAO(db)
+	userDAO := dao.NewUseMysqlDAO(db)
 	cmdable := InitCache()
-	userCache := cache.NewUserCache(cmdable)
-	userRepository := repository.NewUserRepository(userDAO, userCache)
+	userCache := cache.NewUserRedisCache(cmdable)
+	userRepository := repository.NewCachedUserRepository(userDAO, userCache)
+	userService := service.NewUserService(userRepository)
+	userHandler := web.NewUserHandler(userService)
+	v := web.InitUserMidleware()
+	engine := web.InitWebService(userHandler, v)
+	return engine
+}
+
+func InitDownCacheWebService() *gin.Engine {
+	db := InitDb()
+	userDAO := dao.NewUseMysqlDAO(db)
+	freecacheCache := InitMemoryCache()
+	userCache := cache.NewUserMemoryCache(freecacheCache)
+	userRepository := repository.NewCachedUserRepository(userDAO, userCache)
 	userService := service.NewUserService(userRepository)
 	userHandler := web.NewUserHandler(userService)
 	v := web.InitUserMidleware()

@@ -1,12 +1,3 @@
-/*
- * @Author: p_hanxichen
- * @Date: 2023-08-23 10:18:21
- * @LastEditors: p_hanxichen
- * @FilePath: /go/src/webook/internal/service/user.go
- * @Description: 用户服务层
- *
- * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
- */
 package service
 
 import (
@@ -19,18 +10,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserService interface {
+	SignUp(ctx context.Context, user *domain.User) error
+	Login(ctx context.Context, user *domain.User) (*domain.User, error)
+	FindByEmail(ctx context.Context, email string) (*domain.User, error)
+	FindById(ctx context.Context, id uint64) (*domain.User, error)
+	FindProfileByUser(ctx context.Context, user *domain.User) (*domain.Profile, error)
+	AddProfile(ctx context.Context, user *domain.User, profile *domain.Profile) (*domain.Profile, error)
+}
+
 var (
 	ErrEmailConflict   = repository.ErrEmailConflict
 	ErrUserNotFound    = repository.ErrUserNotFound
 	ErrPasswordInvalid = errors.New("密码不正确")
 )
 
-type UserService struct {
-	repo *repository.UserRepository
+type UserServiceInstance struct {
+	repo repository.UserRepository
 }
 
-func NewUserService(repo *repository.UserRepository) *UserService {
-	return &UserService{
+func NewUserService(repo repository.UserRepository) *UserServiceInstance {
+	return &UserServiceInstance{
 		repo: repo,
 	}
 }
@@ -41,7 +41,7 @@ func NewUserService(repo *repository.UserRepository) *UserService {
  * @param {*domain.User} user
  * @return {error}
  */
-func (svc *UserService) SignUp(ctx context.Context, user *domain.User) error {
+func (svc *UserServiceInstance) SignUp(ctx context.Context, user *domain.User) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (svc *UserService) SignUp(ctx context.Context, user *domain.User) error {
  * @param {*domain.User} user
  * @return {*domain.User, error}
  */
-func (svc *UserService) Login(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (svc *UserServiceInstance) Login(ctx context.Context, user *domain.User) (*domain.User, error) {
 	findUser, err := svc.repo.FindByEmail(ctx, user.Email)
 	if err != nil {
 		return &domain.User{}, err
@@ -75,7 +75,7 @@ func (svc *UserService) Login(ctx context.Context, user *domain.User) (*domain.U
  * @param {string} email
  * @return {*domain.User, error}
  */
-func (svc *UserService) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (svc *UserServiceInstance) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	return svc.repo.FindByEmail(ctx, email)
 }
 
@@ -85,7 +85,7 @@ func (svc *UserService) FindByEmail(ctx context.Context, email string) (*domain.
  * @param {uint64} id
  * @return {*domain.User, error}
  */
-func (svc *UserService) FindById(ctx context.Context, id uint64) (*domain.User, error) {
+func (svc *UserServiceInstance) FindById(ctx context.Context, id uint64) (*domain.User, error) {
 	return svc.repo.FindById(ctx, id)
 }
 
@@ -95,7 +95,7 @@ func (svc *UserService) FindById(ctx context.Context, id uint64) (*domain.User, 
  * @param {*domain.User} user
  * @return {*domain.Profile, error}
  */
-func (svc *UserService) FindProfileByUser(ctx context.Context, user *domain.User) (*domain.Profile, error) {
+func (svc *UserServiceInstance) FindProfileByUser(ctx context.Context, user *domain.User) (*domain.Profile, error) {
 	findProfile, err := svc.repo.FindProfileByUser(ctx, dao.User{
 		Id:    user.Id,
 		Email: user.Email,
@@ -113,7 +113,7 @@ func (svc *UserService) FindProfileByUser(ctx context.Context, user *domain.User
  * @param {*domain.Profile} profile
  * @return {*domain.Profile, error}
  */
-func (svc *UserService) AddProfile(ctx context.Context, user *domain.User, profile *domain.Profile) (*domain.Profile, error) {
+func (svc *UserServiceInstance) AddProfile(ctx context.Context, user *domain.User, profile *domain.Profile) (*domain.Profile, error) {
 	return svc.repo.AddProfile(ctx, user, profile)
 
 }

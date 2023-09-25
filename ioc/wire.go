@@ -25,9 +25,25 @@ func InitWebService() *gin.Engine {
 	wire.Build(
 		// db层
 		InitDb, InitCache,
-		cache.NewUserCache, dao.NewUserDAO,
+		cache.NewUserRedisCache, dao.NewUseMysqlDAO,
 		// repository
-		repository.NewUserRepository,
+		repository.NewCachedUserRepository,
+		// service
+		service.NewUserService,
+		// web
+		web.NewUserHandler,
+		web.InitWebService, web.InitUserMidleware,
+	)
+	return new(gin.Engine)
+}
+
+func InitDownCacheWebService() *gin.Engine {
+	wire.Build(
+		// db层
+		InitDb, InitMemoryCache,
+		cache.NewUserMemoryCache, dao.NewUseMysqlDAO,
+		// repository
+		repository.NewCachedUserRepository,
 		// service
 		service.NewUserService,
 		// web

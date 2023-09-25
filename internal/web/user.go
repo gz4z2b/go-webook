@@ -24,7 +24,7 @@ import (
 
 // UserHandler 我准备在上面定义跟用户有关的路由
 type UserHandler struct {
-	svc                       *service.UserService
+	svc                       service.UserService
 	emailExpersion            *regexp.Regexp
 	passwordExpersion         *regexp.Regexp
 	birthdayRegexExpersion    *regexp.Regexp
@@ -33,7 +33,7 @@ type UserHandler struct {
 }
 
 // UserHandler构造方法
-func NewUserHandler(svc *service.UserService) *UserHandler {
+func NewUserHandler(svc service.UserService) *UserHandler {
 	const (
 		passwordRegexpPattern   = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,72}$`
 		emailRegextPattern      = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
@@ -223,6 +223,7 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
+
 	_, err = u.svc.AddProfile(ctx, user, &domain.Profile{
 		NickName:    req.NickName,
 		BirthDay:    birthDay.UnixMilli(),
