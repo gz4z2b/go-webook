@@ -114,6 +114,7 @@ func (u *UserHandler) Signup(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "success")
 }
 
+// Login 登录
 func (u *UserHandler) Login(ctx *gin.Context) {
 
 	// 登录
@@ -158,6 +159,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "登录成功")
 }
 
+// Edit 修改
 func (u *UserHandler) Edit(ctx *gin.Context) {
 	// 修改
 	type editReq struct {
@@ -238,6 +240,7 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 }
 
+// Profile 个人档案
 func (u *UserHandler) Profile(ctx *gin.Context) {
 	// 个人档案
 	email, exist := ctx.Get("user_email")
@@ -261,6 +264,7 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 
 }
 
+// Logout 登出
 func (u *UserHandler) Logout(ctx *gin.Context) {
 	userClaims := domain.UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
