@@ -12,17 +12,17 @@ package domain
 import jwt "github.com/golang-jwt/jwt/v5"
 
 type User struct {
-	Id       uint64
-	Email    string
-	Password string
-	Profile  Profile
+	Id       uint64  `json:"id"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
+	Profile  Profile `json:"profile"`
 }
 
 type Profile struct {
-	UserId      uint64
-	NickName    string
-	BirthDay    int64
-	Description string
+	UserId      uint64 `json:"user_id"`
+	NickName    string `json:"nick_name"`
+	BirthDay    int64  `json:"birth_day"`
+	Description string `json:"description"`
 }
 
 type UserClaims struct {

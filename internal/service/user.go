@@ -29,7 +29,7 @@ type UserServiceInstance struct {
 	repo repository.UserRepository
 }
 
-func NewUserService(repo repository.UserRepository) *UserServiceInstance {
+func NewUserService(repo repository.UserRepository) UserService {
 	return &UserServiceInstance{
 		repo: repo,
 	}

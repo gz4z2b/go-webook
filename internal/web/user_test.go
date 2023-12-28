@@ -18,6 +18,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"github.com/gz4z2b/go-webook/internal/domain"
 	"github.com/gz4z2b/go-webook/internal/service"
@@ -305,6 +306,40 @@ func TestUserHandler_Edit(t *testing.T) {
 
 			assert.Equal(t, tt.wantBody, resp.Body.String())
 			assert.Equal(t, tt.wantCode, resp.Code)
+		})
+	}
+}
+
+func TestUserHandler_Profile(t *testing.T) {
+	type fields struct {
+		svc                       service.UserService
+		emailExpersion            *regexp.Regexp
+		passwordExpersion         *regexp.Regexp
+		birthdayRegexExpersion    *regexp.Regexp
+		nickNameRegexExpersion    *regexp.Regexp
+		descriptionRegexExpersion *regexp.Regexp
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &UserHandler{
+				svc:                       tt.fields.svc,
+				emailExpersion:            tt.fields.emailExpersion,
+				passwordExpersion:         tt.fields.passwordExpersion,
+				birthdayRegexExpersion:    tt.fields.birthdayRegexExpersion,
+				nickNameRegexExpersion:    tt.fields.nickNameRegexExpersion,
+				descriptionRegexExpersion: tt.fields.descriptionRegexExpersion,
+			}
+			u.Profile(tt.args.ctx)
 		})
 	}
 }

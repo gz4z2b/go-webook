@@ -2,7 +2,7 @@
  * @Author: p_hanxichen
  * @Date: 2023-08-16 20:27:11
  * @LastEditors: p_hanxichen
- * @FilePath: /go/src/webook/internal/web/user.go
+ * @FilePath: /webook/internal/web/user.go
  * @Description: 用户接口
  *
  * Copyright (c) 2023 by gdtengnan, All Rights Reserved.
@@ -10,7 +10,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -260,7 +259,7 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 	}
 	profile, _ := u.svc.FindProfileByUser(ctx, user)
 
-	ctx.String(http.StatusOK, fmt.Sprintf("user：%v+, profile:%v+", user, profile))
+	ctx.JSON(http.StatusOK, profile)
 
 }
 
